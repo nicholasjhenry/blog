@@ -3,6 +3,7 @@
 This is a central repository of my blog posts published across a number of platforms including:
 
 * https://medium.com/@nicholasjhenry
+* https://gist.github.com/nicholasjhenry (Code Snippets only)
 * http://blog.firsthand.ca (deprecated)
 
 ## Status (WIP)
