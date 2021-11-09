@@ -1,6 +1,10 @@
 ---
 title: Peventing Brain Freeze - Curate your source code for onboarding
 published_url:
+tags:
+  - elixir
+  - living-documentation
+  - presentation
 ---
 
 # Curate your source code for onboarding
