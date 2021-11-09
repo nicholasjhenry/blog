@@ -84,7 +84,7 @@ is the alternative to traditional documentation?*
 
 ## Living Documentation as an alternative
 
-![Living Documentation  -  Continuous knowledge sharing by design, Cyrille Martraire](./assets/book-cover.jpg)
+![Living Documentation  -  Continuous knowledge sharing by design, Cyrille Martraire](./assets/images/book-cover.jpg)
 
 We want to focus on reliable documentation, low effort, collaborative and insightful. These
 are the four principles that *Cyrille Martraire* laid out in his book [Living Documentation, a book
