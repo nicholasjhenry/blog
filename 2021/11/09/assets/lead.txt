@@ -1,0 +1,9 @@
+"Knowledge Sharing—Leading and Lagging Indicators", part two of the "Preventing Brain Freeze" series on Living Documentation in Elixir is now available!
+
+https://medium.com/living-documentation-in-elixir/knowledge-sharing-leading-and-lagging-indicators-635aff30ca73
+
+I'm publishing the script for my talk from last month's #elixirconf as a series of posts on a new Medium publication "Living Documentation in Elixir".
+
+https://youtu.be/EMWWv6RyqMc
+
+#elixirlang #livingdoc
