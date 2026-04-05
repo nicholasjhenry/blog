@@ -8,9 +8,9 @@ tags: "elixir, architecture, dci, domain-modeling, phoenix"
 
 I keep running into the same problem in Phoenix applications. A schema starts lean, then accumulates functions from every use case it participates in. `SeasonalContract` grows a `record_commitment/2` for deliveries, a `flag_for_audit/1` for compliance, a `summarize_for_invoice/1` for billing. The module becomes a junk drawer of behaviors that have nothing in common except the data type they operate on.
 
-That pressure reminded me of something I hadn't thought about in a while. Years ago I read James Coplien and Gertrud Bjørnvig's [*Lean Architecture*](https://books.google.ca/books/about/Lean_Architecture.html?id=gUWhCwAAQBAJ), which introduced me to DCI — Data-Context-Interaction — an architectural paradigm by Trygve Reenskaug (the same person who gave us MVC). The core idea is to separate code into three perspectives: **Data** (how information is represented), **Context** (the runtime scenario assembling objects for a use case), and **Interaction** (the roles those objects play within that scenario).
+That pressure reminded me of DCI — Data-Context-Interaction — an architectural paradigm by Trygve Reenskaug (the same person who gave us MVC). I first encountered it through Coplien and Bjørnvig's [*Lean Architecture*](https://books.google.ca/books/about/Lean_Architecture.html?id=gUWhCwAAQBAJ). The core idea is to separate code into three perspectives: **Data** (how information is represented), **Context** (the runtime scenario assembling objects for a use case), and **Interaction** (the roles those objects play within that scenario).
 
-There's something fun about an idea that lodges in your head for years and then resurfaces when you're working in a completely different language. I'd been thinking about [DCI in the context of Ruby](https://www.saturnflyer.com/clean-ruby) back then. Now I'm curious how it maps to Elixir — and it maps more naturally than I expected.
+I'd been thinking about [DCI in the context of Ruby](https://www.saturnflyer.com/clean-ruby) years ago, and the idea lodged in my head without ever finding a natural home. Now I'm curious how it maps to Elixir — and it maps more naturally than I expected.
 
 ## The Mapping
 
@@ -20,11 +20,11 @@ There's something fun about an idea that lodges in your head for years and then 
 | Context              | A use-case module with a struct          |
 | Interaction (Roles)  | Plain modules that accept data structs   |
 
-The thing that caught my attention: in OO languages, DCI requires injecting roles into objects at runtime — mixins, decorators, method_missing tricks. Elixir doesn't need any of that. A role is just a module that takes a struct as its first argument. The "injection" is the function call itself. At least, that's how I'm reading it.
+The thing that caught my attention: in OO languages, DCI requires injecting roles into objects at runtime — mixins, decorators, method_missing tricks. Elixir doesn't need any of that. A role is just a module that takes a struct as its first argument. The "injection" is the function call itself. No ceremony required.
 
 ## A Concrete Example
 
-I keep coming back to a domain I use for talks — Harvest Tracker, an application for managing seasonal contracts between farms and restaurants. Let me walk through scheduling a delivery, where three structs each play a distinct role.
+Here's a domain I've been modeling — Harvest Tracker, an application for managing seasonal contracts between farms and restaurants. Let me walk through scheduling a delivery, where three structs each play a distinct role.
 
 ### Data — Just the Facts
 
@@ -63,7 +63,22 @@ end
 
 defmodule HarvestTracker.ScheduleDelivery.HarvestSupplier do
   def reserve(farm, produce, quantity_kg) do
-    # Check and reserve available inventory
+    case Enum.find(farm.inventory, &(&1.produce == produce)) do
+      %{available_kg: available} = item when available >= quantity_kg ->
+        updated_inventory =
+          Enum.map(farm.inventory, fn
+            ^item -> %{item | available_kg: Decimal.sub(available, quantity_kg)}
+            other -> other
+          end)
+
+        {:ok, %{farm | inventory: updated_inventory}}
+
+      %{available_kg: available} ->
+        {:error, {:insufficient_inventory, available}}
+
+      nil ->
+        {:error, {:produce_not_found, produce}}
+    end
   end
 end
 
@@ -114,7 +129,37 @@ end
 
 ## Noun vs. Verb: A Naming Convention That Emerged
 
-One convention fell out of this exercise that I find clarifying. The domain context is a **noun** — `ScheduleDelivery` names a domain concept. The application service that orchestrates I/O around it is a **verb** — `ScheduleHarvestDelivery` names what the system does. If you see a noun, you're in pure domain territory. If you see a verb, you're at the boundary where side effects happen. I'm not sure this holds up in every case, but it's been a useful heuristic so far.
+One convention fell out of this exercise. The domain context is a **noun** — `ScheduleDelivery` names a domain concept. It's pure: no database, no side effects, just data transformations. The application service that orchestrates I/O around it is a **verb** — `ScheduleHarvestDelivery` names what the system *does*:
+
+```elixir
+defmodule HarvestTracker.ScheduleHarvestDelivery do
+  alias HarvestTracker.{ScheduleDelivery, Repo}
+
+  def call(params) do
+    ctx = %ScheduleDelivery{
+      contract:       Repo.get!(SeasonalContract, params.contract_id),
+      farm:           Repo.get!(Farm, params.farm_id) |> Repo.preload(:inventory),
+      restaurant:     Repo.get!(Restaurant, params.restaurant_id),
+      quantity_kg:    params.quantity_kg,
+      scheduled_date: params.scheduled_date,
+      requested_by:   params.current_scope,
+      correlation_id: Ecto.UUID.generate()
+    }
+
+    with {:ok, ctx} <- ScheduleDelivery.execute(ctx) do
+      Repo.transaction(fn ->
+        Repo.update!(change(ctx.contract))
+        Repo.update!(change(ctx.farm))
+        Repo.insert!(%Delivery{contract_id: ctx.contract.id, scheduled_date: ctx.scheduled_date})
+      end)
+
+      {:ok, ctx}
+    end
+  end
+end
+```
+
+If you see a noun, you're in pure domain territory. If you see a verb, you're at the boundary where side effects happen. It's been a useful heuristic so far for keeping the two layers distinct.
 
 ## Where CRC Fits In
 
@@ -128,4 +173,4 @@ That boundary — intrinsic vs. role-specific — seems like a useful question t
 
 I haven't battle-tested this in a large codebase yet. The pattern feels right for complex domains where the same data participates in multiple use cases with different behaviors. For simpler CRUD flows, it would be overhead.
 
-But the core idea — that a `SeasonalContract` shouldn't have to know about every scenario it might participate in — that feels like something worth exploring further. And Elixir's module system seems particularly well suited to it.
+But the core idea holds: a `SeasonalContract` shouldn't have to know about every scenario it might participate in. In OO languages, DCI requires runtime gymnastics to give objects new behaviors. In Elixir, you just call a function. The role *is* the module. The context *is* the struct. Maybe that's why the idea, dormant for years, finally clicked.
