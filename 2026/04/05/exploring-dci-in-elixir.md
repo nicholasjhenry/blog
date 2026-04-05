@@ -6,6 +6,8 @@ tags: "elixir, architecture, dci, domain-modeling, phoenix"
 
 # DCI in Elixir: Giving Your Data Roles to Play
 
+![Exploring how DCI (Data-Context-Interaction) architecture maps to Elixir](./header.png)
+
 I keep running into the same problem in Phoenix applications. A schema starts lean, then accumulates functions from every use case it participates in. `SeasonalContract` grows a `record_commitment/2` for deliveries, a `flag_for_audit/1` for compliance, a `summarize_for_invoice/1` for billing. The module becomes a junk drawer of behaviors that have nothing in common except the data type they operate on.
 
 That pressure reminded me of DCI — Data-Context-Interaction — an architectural paradigm by Trygve Reenskaug (the same person who gave us MVC). I first encountered it through Coplien and Bjørnvig's [*Lean Architecture*](https://books.google.ca/books/about/Lean_Architecture.html?id=gUWhCwAAQBAJ). The core idea is to separate code into three perspectives: **Data** (how information is represented), **Context** (the runtime scenario assembling objects for a use case), and **Interaction** (the roles those objects play within that scenario).
