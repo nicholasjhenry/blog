@@ -64,17 +64,18 @@ end
 defmodule HarvestTracker.ScheduleDelivery.HarvestSupplier do
   def reserve(farm, produce, quantity_kg) do
     case Enum.find(farm.inventory, &(&1.produce == produce)) do
-      %{available_kg: available} = item when available >= quantity_kg ->
-        updated_inventory =
-          Enum.map(farm.inventory, fn
-            ^item -> %{item | available_kg: Decimal.sub(available, quantity_kg)}
-            other -> other
-          end)
+      %{available_kg: available} = item ->
+        if Decimal.compare(available, quantity_kg) != :lt do
+          updated_inventory =
+            Enum.map(farm.inventory, fn
+              ^item -> %{item | available_kg: Decimal.sub(available, quantity_kg)}
+              other -> other
+            end)
 
-        {:ok, %{farm | inventory: updated_inventory}}
-
-      %{available_kg: available} ->
-        {:error, {:insufficient_inventory, available}}
+          {:ok, %{farm | inventory: updated_inventory}}
+        else
+          {:error, {:insufficient_inventory, available}}
+        end
 
       nil ->
         {:error, {:produce_not_found, produce}}
@@ -134,6 +135,7 @@ One convention fell out of this exercise. The domain context is a **noun** — `
 ```elixir
 defmodule HarvestTracker.ScheduleHarvestDelivery do
   alias HarvestTracker.{ScheduleDelivery, Repo}
+  import Ecto.Changeset, only: [change: 1]
 
   def call(params) do
     ctx = %ScheduleDelivery{
@@ -146,15 +148,18 @@ defmodule HarvestTracker.ScheduleHarvestDelivery do
       correlation_id: Ecto.UUID.generate()
     }
 
-    with {:ok, ctx} <- ScheduleDelivery.execute(ctx) do
-      Repo.transaction(fn ->
-        Repo.update!(change(ctx.contract))
-        Repo.update!(change(ctx.farm))
-        Repo.insert!(%Delivery{contract_id: ctx.contract.id, scheduled_date: ctx.scheduled_date})
-      end)
-
+    with {:ok, ctx} <- ScheduleDelivery.execute(ctx),
+         {:ok, _} <- persist(ctx) do
       {:ok, ctx}
     end
+  end
+
+  defp persist(ctx) do
+    Repo.transaction(fn ->
+      Repo.update!(change(ctx.contract))
+      Repo.update!(change(ctx.farm))
+      Repo.insert!(%Delivery{contract_id: ctx.contract.id, scheduled_date: ctx.scheduled_date})
+    end)
   end
 end
 ```
