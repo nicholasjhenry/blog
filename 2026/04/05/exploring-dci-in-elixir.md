@@ -24,9 +24,11 @@ I'd been thinking about [DCI in the context of Ruby](https://www.saturnflyer.com
 
 The thing that caught my attention: in OO languages, DCI requires injecting roles into objects at runtime — mixins, decorators, method_missing tricks. Elixir doesn't need any of that. A role is just a module that takes a struct as its first argument. The "injection" is the function call itself. No ceremony required.
 
+I'll walk through each perspective with a delivery scheduling example, then look at how DCI relates to CRC.
+
 ## A Concrete Example
 
-Here's a domain I've been modeling — Harvest Tracker, an application for managing seasonal contracts between farms and restaurants. Let me walk through scheduling a delivery, where three structs each play a distinct role.
+I've been modeling Harvest Tracker, an application for managing seasonal contracts between farms and restaurants. Let me walk through scheduling a delivery, where three structs each play a distinct role.
 
 ### Data — Just the Facts
 
@@ -48,10 +50,10 @@ end
 
 ### Interaction — Roles Reveal Intent
 
-Here's where it gets interesting. Each participant plays a named role in this scenario:
+Each participant in the scenario gets its own role module — a plain module namespaced under the use case:
 
 ```elixir
-defmodule HarvestTracker.ScheduleDelivery.FulfillmentLedger do
+defmodule HarvestTracker.DeliverySchedule.FulfillmentLedger do
   def record_commitment(contract, quantity_kg) do
     remaining = Decimal.sub(contract.committed_kg, contract.delivered_kg)
 
@@ -63,43 +65,53 @@ defmodule HarvestTracker.ScheduleDelivery.FulfillmentLedger do
   end
 end
 
-defmodule HarvestTracker.ScheduleDelivery.HarvestSupplier do
+defmodule HarvestTracker.DeliverySchedule.HarvestSupplier do
   def reserve(farm, produce, quantity_kg) do
-    case Enum.find(farm.inventory, &(&1.produce == produce)) do
-      %{available_kg: available} = item ->
-        if Decimal.compare(available, quantity_kg) != :lt do
-          updated_inventory =
-            Enum.map(farm.inventory, fn
-              ^item -> %{item | available_kg: Decimal.sub(available, quantity_kg)}
-              other -> other
-            end)
-
-          {:ok, %{farm | inventory: updated_inventory}}
-        else
-          {:error, {:insufficient_inventory, available}}
-        end
-
-      nil ->
-        {:error, {:produce_not_found, produce}}
+    with {:ok, item} <- find_item(farm.inventory, produce),
+         :ok <- check_sufficient(item.available_kg, quantity_kg) do
+      {:ok, deduct_inventory(farm, item, quantity_kg)}
     end
+  end
+
+  defp find_item(inventory, produce) do
+    case Enum.find(inventory, &(&1.produce == produce)) do
+      nil -> {:error, {:produce_not_found, produce}}
+      item -> {:ok, item}
+    end
+  end
+
+  defp check_sufficient(available, requested) do
+    if Decimal.compare(available, requested) != :lt do
+      :ok
+    else
+      {:error, {:insufficient_inventory, available}}
+    end
+  end
+
+  defp deduct_inventory(farm, item, quantity_kg) do
+    updated = Enum.map(farm.inventory, fn
+      ^item -> %{item | available_kg: Decimal.sub(item.available_kg, quantity_kg)}
+      other -> other
+    end)
+    %{farm | inventory: updated}
   end
 end
 
-defmodule HarvestTracker.ScheduleDelivery.DeliveryRecipient do
+defmodule HarvestTracker.DeliverySchedule.DeliveryRecipient do
   def validate(%{account_status: :active}), do: :ok
   def validate(%{account_status: :suspended, name: name}),
     do: {:error, {:account_suspended, name}}
 end
 ```
 
-`FulfillmentLedger`, `HarvestSupplier`, `DeliveryRecipient` — what I like about these names is they tell you *why* each struct is in this scenario, not just what type it is. A `SeasonalContract` is a `FulfillmentLedger` here, but it could be an `AuditSubject` in a compliance flow. The role stays with the use case, not the data.
+**`FulfillmentLedger`**, **`HarvestSupplier`**, **`DeliveryRecipient`** — these names tell you *why* each struct is in this scenario, not just what type it is. A `SeasonalContract` is a `FulfillmentLedger` here, but it could be an `AuditSubject` in a compliance flow. The role stays with the use case, not the data. Each role module is a labeled drawer — behavior has a place and a name, instead of accumulating in one junk drawer on the schema.
 
 ### Context — The Scenario as Data
 
 The context assembles participants into a struct, then executes the scenario:
 
 ```elixir
-defmodule HarvestTracker.ScheduleDelivery do
+defmodule HarvestTracker.DeliverySchedule do
   alias __MODULE__.{FulfillmentLedger, HarvestSupplier, DeliveryRecipient}
 
   defstruct [:contract, :farm, :restaurant, :quantity_kg,
@@ -119,28 +131,28 @@ Making the context a struct is where this started clicking for me. Before `execu
 
 ```elixir
 test "rejects delivery exceeding allocation" do
-  ctx = %ScheduleDelivery{
+  ctx = %DeliverySchedule{
     contract:    %SeasonalContract{committed_kg: Decimal.new("100"), delivered_kg: Decimal.new("90")},
     farm:        %Farm{inventory: [%{produce: "kale", available_kg: Decimal.new("50")}]},
     restaurant:  %Restaurant{account_status: :active},
     quantity_kg: Decimal.new("20")
   }
 
-  assert {:error, {:exceeds_allocation, _}} = ScheduleDelivery.execute(ctx)
+  assert {:error, {:exceeds_allocation, _}} = DeliverySchedule.execute(ctx)
 end
 ```
 
 ## Noun vs. Verb: A Naming Convention That Emerged
 
-One convention fell out of this exercise. The domain context is a **noun** — `ScheduleDelivery` names a domain concept. It's pure: no database, no side effects, just data transformations. The application service that orchestrates I/O around it is a **verb** — `ScheduleHarvestDelivery` names what the system *does*:
+One convention fell out of this exercise. The domain context is a **noun** — `DeliverySchedule` names a domain concept. It's pure: no database, no side effects, just data transformations. The application service that orchestrates I/O around it is a **verb** — `ScheduleHarvestDelivery` names what the system *does*:
 
 ```elixir
 defmodule HarvestTracker.ScheduleHarvestDelivery do
-  alias HarvestTracker.{ScheduleDelivery, Repo}
+  alias HarvestTracker.{DeliverySchedule, Repo}
   import Ecto.Changeset, only: [change: 1]
 
   def call(params) do
-    ctx = %ScheduleDelivery{
+    ctx = %DeliverySchedule{
       contract:       Repo.get!(SeasonalContract, params.contract_id),
       farm:           Repo.get!(Farm, params.farm_id) |> Repo.preload(:inventory),
       restaurant:     Repo.get!(Restaurant, params.restaurant_id),
@@ -150,7 +162,7 @@ defmodule HarvestTracker.ScheduleHarvestDelivery do
       correlation_id: Ecto.UUID.generate()
     }
 
-    with {:ok, ctx} <- ScheduleDelivery.execute(ctx),
+    with {:ok, ctx} <- DeliverySchedule.execute(ctx),
          {:ok, _} <- persist(ctx) do
       {:ok, ctx}
     end
@@ -172,12 +184,17 @@ If you see a noun, you're in pure domain territory. If you see a verb, you're at
 
 Bruce Tate's CRC pattern (Constructors, Reducers, Converters) initially seemed at odds with DCI to me. CRC pushes behavior toward the data module — `record_commitment/2` would naturally live on `SeasonalContract` as a reducer. DCI pulls it out into a role module.
 
-I think they might operate at different scopes. If a transformation is *intrinsic* to the type regardless of use case — `SeasonalContract.cancel/1` — it probably belongs on the data module per CRC. If it's *role-specific* to a scenario — recording a commitment as part of scheduling a delivery — maybe it belongs in the role module per DCI.
+I think they operate at different scopes. The question to ask: is this transformation intrinsic to the type, or specific to a role in a scenario?
 
-That boundary — intrinsic vs. role-specific — seems like a useful question to ask whenever I'm deciding where a function lives. Though I suspect the line isn't always clean in practice.
+- **Intrinsic** — the transformation makes sense regardless of use case. `SeasonalContract.cancel/1` belongs on the data module per CRC.
+- **Role-specific** — the transformation only makes sense within a particular scenario. `FulfillmentLedger.record_commitment/2` belongs on the role module per DCI.
+
+The line blurs in practice — I don't have a clean rule yet. But the question itself has been useful for deciding where a function lives.
 
 ## What I'm Still Thinking About
 
 I haven't battle-tested this in a large codebase yet. The pattern feels right for complex domains where the same data participates in multiple use cases with different behaviors. For simpler CRUD flows, it would be overhead.
 
-But the core idea holds: a `SeasonalContract` shouldn't have to know about every scenario it might participate in. In OO languages, DCI requires runtime gymnastics to give objects new behaviors. In Elixir, you just call a function. The role *is* the module. The context *is* the struct. Maybe that's why the idea, dormant for years, finally clicked.
+Before this exercise, I had one option for organizing use-case-specific behavior: put it on the schema and hope the module doesn't become unreadable. Now I have a second option — pull that behavior into a role module namespaced under the use case, where the name communicates intent and the code stays testable without a database.
+
+If you're staring at a schema that's grown functions from three different use cases, try pulling one out into a role module. Namespace it under the use case. See if the name reveals intent you didn't have before.
