@@ -1,9 +1,7 @@
 ---
 title: How CivilCode promotes civilized custom software development
-published_url: https://blog.civilcode.io/how-civilcode-promotes-civilized-custom-software-development-26d172ab3900
+canonical_url: https://blog.civilcode.io/how-civilcode-promotes-civilized-custom-software-development-26d172ab3900
 ---
-
-# How CivilCode promotes civilized custom software development
 
 The origins of the disciplined methodology used by CivilCode can be traced to the early careers of
 the company’s two co-founders: [Nicholas Henry](https://www.linkedin.com/in/nicholasjhenry/) and

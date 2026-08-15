@@ -1,9 +1,7 @@
 ---
-title: Fast software development avoids this roadblock
-published_url: https://blog.civilcode.io/why-software-development-starts-with-sticky-notes-d21e80c976c6
+title: Why software development starts with sticky notes
+canonical_url: https://blog.civilcode.io/why-software-development-starts-with-sticky-notes-d21e80c976c6
 ---
-
-# Why software development starts with sticky notes
 
 When starting a software development project, there’s usually a story about how the existing solution grew into its current form. While that story can be informative, it’s important to clear the slate and design according to current, actual needs. Event Storming is an excellent tool for use in the discovery process to allow software developers to ask questions, and to give domain experts an opportunity to explain their process.
 
@@ -23,7 +21,7 @@ As events are captured, they can be re-evaluated to ensure that they align with 
 
 Event Storming also identifies internal and external triggers that result in events. Events are mapped out first, and then the **actions** (blue) that trigger those events are added in. Actions are defined in present tense; for example, *Request Contract*. However, some events may occur simply by the passing of time; for example, *Contract Expired*.
 
-![Event Storming for a Contract Management System](assets/example.jpeg)
+![Event Storming for a Contract Management System]({{ '/assets/posts/2018-08-31-why-software-development-starts-with-sticky-notes/example.jpeg' | relative_url }})
 
 ## What’s needed for Event Storming success
 

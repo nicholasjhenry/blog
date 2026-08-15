@@ -1,0 +1,259 @@
+---
+# Front matter is required so Jekyll processes this file.
+# Variable overrides must come before the minima import.
+---
+
+$base-font-family: Charter, "Iowan Old Style", Georgia, Cambria, "Times New Roman", serif;
+$base-font-size:   19px;
+$base-line-height: 1.7;
+$spacing-unit:     32px;
+
+$text-color:       #1c1c1c;
+$background-color: #fffdfa;
+$brand-color:      #1f5c4d;
+$grey-color:       #6b6b6b;
+
+$content-width:    720px;
+$on-palm:          600px;
+$on-laptop:        720px;
+
+@import "minima";
+
+// ---------------------------------------------------------------------------
+// Refinements on top of minima.
+//
+// The site describes itself as field notes, so the theme is built to read as a
+// working notebook: serif prose on paper stock, every piece of metadata stamped
+// in monospace, and entries separated by ruled hairlines. Restraint is the
+// point -- typography, rules, and spacing only, no ornament.
+// ---------------------------------------------------------------------------
+
+$mono-font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+
+$rule-color:   #e5e0d7; // ruled lines on the paper
+$ledger-width: 112px;   // date gutter on the home index
+$ledger-gap:   28px;
+
+body {
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+a {
+  text-decoration-thickness: 1px;
+  text-underline-offset: 2px;
+}
+
+::selection {
+  background: rgba(31, 92, 77, 0.14);
+}
+
+hr {
+  border: 0;
+  border-top: 1px solid $rule-color;
+  margin: $spacing-unit * 1.5 0;
+}
+
+// Anything that annotates rather than narrates -- dates, notices, captions --
+// is set in monospace. It marks the difference between the note and the record.
+%stamp {
+  font-family: $mono-font-family;
+  font-size: 0.72em;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.01em;
+  color: $grey-color;
+}
+
+// Headings sit closer to their own text and further from what precedes them.
+h1, h2, h3, h4, h5, h6 {
+  line-height: 1.25;
+  letter-spacing: -0.011em;
+  margin-top: $spacing-unit * 1.4;
+  margin-bottom: $spacing-unit * 0.4;
+}
+
+h1 { font-size: 1.9em; }
+h2 { font-size: 1.4em; }
+h3 { font-size: 1.15em; }
+
+// Header and footer: hairlines, not slabs.
+.site-header {
+  border-top: none;
+  border-bottom: 1px solid $rule-color;
+  min-height: 0;
+  padding: $spacing-unit * 0.8 0;
+}
+
+// Minima floats the masthead and the nav against each other and props the
+// header open with a 73px line-height. A flex row does the same job without the
+// dead vertical space, and lets the name and subtitle stack as one block.
+.site-header .wrapper {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  column-gap: $spacing-unit;
+
+  // Minima's clearfix would otherwise count as a third flex item.
+  &::after { display: none; }
+}
+
+.site-title,
+.site-title:visited {
+  float: none;
+  display: block;
+  font-size: 1.3em;
+  line-height: 1.25;
+  font-weight: 600;
+  letter-spacing: -0.015em;
+  color: $text-color;
+
+  &:hover { text-decoration: none; }
+}
+
+// Says what the notebook is for on every page, not just the home index -- most
+// readers arrive on a post, not the front door.
+.site-subtitle {
+  @extend %stamp;
+  margin: 0.3em 0 0;
+}
+
+.site-nav {
+  float: none;
+  line-height: $base-line-height;
+}
+
+.site-nav .page-link {
+  @extend %stamp;
+  font-size: 0.8em; // the nav sits at body size, so scale against that instead
+}
+
+.site-footer {
+  border-top: 1px solid $rule-color;
+  padding: $spacing-unit 0;
+}
+
+.footer-heading { display: none; }
+
+// Minima sets an absolute font-size on the column wrapper, so the stamp has to
+// land there rather than on .site-footer to take effect.
+.site-footer .footer-col-wrapper { @extend %stamp; }
+
+.post-meta { @extend %stamp; }
+
+// ---------------------------------------------------------------------------
+// The index reads as a ledger: dates ruled off in the left gutter, one entry
+// per line of the page.
+// ---------------------------------------------------------------------------
+
+.post-list {
+  margin-left: 0;
+  border-top: 1px solid $rule-color;
+}
+
+.post-list > li {
+  margin-bottom: 0;
+  padding: $spacing-unit * 0.9 0;
+  border-bottom: 1px solid $rule-color;
+}
+
+.post-list h3 {
+  margin: 0.1em 0 0.3em;
+  font-size: 1.3em;
+}
+
+.post-link,
+.post-link:visited {
+  color: $text-color;
+
+  &:hover {
+    color: $brand-color;
+    text-decoration: none;
+  }
+}
+
+.post-excerpt {
+  margin: 0;
+  font-size: 0.94em;
+  color: #545454; // was lighten($text-color, 22%); literal avoids the deprecated global function
+}
+
+// Below this width the gutter would starve the excerpt, so the date simply
+// stacks above the title.
+@media screen and (min-width: 820px) {
+  .post-list > li {
+    display: grid;
+    grid-template-columns: $ledger-width 1fr;
+    column-gap: $ledger-gap;
+  }
+
+  .post-list .post-meta {
+    grid-column: 1;
+    grid-row: 1 / span 2;
+    padding-top: 0.55em; // optically aligns the stamp with the title's x-height
+  }
+
+  .post-list h3,
+  .post-list .post-excerpt {
+    grid-column: 2;
+  }
+}
+
+.post-title {
+  margin-top: 0;
+  line-height: 1.15;
+}
+
+.rss-subscribe {
+  @extend %stamp;
+  margin-top: $spacing-unit * 1.25;
+}
+
+// Code: quiet and monochrome. Minima ships a blue tint and a hard border.
+pre, code {
+  font-family: $mono-font-family;
+  font-size: 0.82em;
+  background-color: #f5f3ef;
+  border: none;
+  border-radius: 0;
+}
+
+code { padding: 0.15em 0.35em; }
+
+// Listings are pasted into the notebook, so they get a margin rule rather than
+// a floating panel.
+pre {
+  padding: $spacing-unit * 0.6 $spacing-unit * 0.7;
+  border-left: 2px solid $rule-color;
+  line-height: 1.55;
+
+  > code {
+    padding: 0;
+    background: none;
+  }
+}
+
+// Upright, not italic with negative tracking -- a quoted note, not a pull quote.
+blockquote {
+  font-size: 1em;
+  font-style: normal;
+  letter-spacing: normal;
+  color: $grey-color-dark;
+  border-left: 2px solid $brand-color;
+  padding-left: $spacing-unit * 0.6;
+}
+
+.post-content img {
+  display: block;
+  margin: $spacing-unit auto;
+  border: 1px solid $rule-color;
+  border-radius: 0;
+}
+
+// "Originally published at" notice, rendered by the post layout override.
+.post-canonical {
+  @extend %stamp;
+  margin-top: $spacing-unit * 1.5;
+  padding-top: $spacing-unit * 0.75;
+  border-top: 1px solid $rule-color;
+}

@@ -1,9 +1,7 @@
 ---
 title: Scale your business with custom software
-published_url: https://blog.civilcode.io/scale-your-business-with-custom-software-4ebf797c1f03
+canonical_url: https://blog.civilcode.io/scale-your-business-with-custom-software-4ebf797c1f03
 ---
-
-# Scale your business with custom software
 
 When demand increases and is about to cross a significant threshold, it’s an opportunity to show what a company is made of and how solid its foundation is. Will existing internal processes be able to handle the increased pressure and volume? A tailored software solution can help ease the transition when scaling rapidly by offering many advantages.
 

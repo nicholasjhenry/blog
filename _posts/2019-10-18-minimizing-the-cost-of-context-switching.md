@@ -1,9 +1,7 @@
 ---
 title: Minimizing the cost of context switching
-published_url: https://blog.civilcode.io/minimizing-the-cost-of-context-switching-ca0d2f6b1187
+canonical_url: https://blog.civilcode.io/minimizing-the-cost-of-context-switching-ca0d2f6b1187
 ---
-
-# Minimizing the cost of context switching
 
 Context switching is a computing term that describes how an operating system stores the state of One
 process (A) before starting another process (B). Before resuming process A, the state of process B

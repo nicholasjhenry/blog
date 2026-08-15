@@ -1,9 +1,7 @@
 ---
 title: Why software development isn’t a linear process
-published_url: https://blog.civilcode.io/why-software-development-isnt-a-linear-process-6f61e4a76746
+canonical_url: https://blog.civilcode.io/why-software-development-isnt-a-linear-process-6f61e4a76746
 ---
-
-# Why software development isn’t a linear process
 
 Embarking on a custom software development project is essentially crossing into uncharted territory.
 Although we most likely won’t face dragons, there are risks. But, it’s by taking risks that you reap

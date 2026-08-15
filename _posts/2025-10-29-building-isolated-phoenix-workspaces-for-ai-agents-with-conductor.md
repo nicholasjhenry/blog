@@ -1,11 +1,9 @@
 ---
 title: Building Isolated Phoenix Workspaces for AI Agents with Conductor
-published_url: https://nicholasjhenry.medium.com/building-isolated-phoenix-workspaces-for-ai-agents-with-conductor-a438d161f191
+canonical_url: https://nicholasjhenry.medium.com/building-isolated-phoenix-workspaces-for-ai-agents-with-conductor-a438d161f191
 ---
 
-# Building Isolated Phoenix Workspaces for AI Agents with Conductor
-
-[Banner](./assets/conductor.png)
+![Banner]({{ '/assets/posts/2025-10-29-building-isolated-phoenix-workspaces-for-ai-agents-with-conductor/conductor.png' | relative_url }})
 
 I’ve been experimenting with agentic coding — letting AI agents handle multiple tasks in parallel across my codebase. The promise is compelling: one agent refactors authentication, another builds a new dashboard feature, a third optimizes database queries, all working simultaneously. But I quickly realised the infrastructure requirements.
 

@@ -1,9 +1,7 @@
 ---
 title: Fast software development avoids this roadblock
-published_url: https://blog.civilcode.io/fast-software-development-avoids-this-roadblock-17bc6b0ae09a
+canonical_url: https://blog.civilcode.io/fast-software-development-avoids-this-roadblock-17bc6b0ae09a
 ---
-
-# Fast software development avoids this roadblock
 
 Software isn’t concrete. However, the “waterfall” model of creating detailed plans, getting approval
 on those plans, and then sticking to those plans originated in the construction industry, and is

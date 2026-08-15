@@ -1,6 +1,8 @@
-# Debugging with `erl_crash.dump`: A Practical Example from the Field
+---
+title: "Debugging with erl_crash.dump: A Practical Example from the Field"
+---
 
-![Banner](./assets/erl_crash_banner.webp)
+![Banner]({{ '/assets/posts/2024-02-01-an-example-of-debugging-with-erl-crash-dump/erl_crash_banner.webp' | relative_url }})
 
 When working with Elixir releases in Docker, even small misconfigurations can cause crashes. Recently, I encountered an issue that perfectly illustrates how the `erl_crash.dump` can help pinpoint the problem. Here’s what happened:
 
@@ -38,19 +40,21 @@ But why is the `application_controller` a good place to start?
 - **Early Indicator:** Since the crash occurred during application boot-up, examining the `application_controller` process often gives you insight into what failed to start correctly.
 - **Stack Trace Clarity:** The stack trace associated with this process typically contains detailed information on the initialization flow, helping to pinpoint the misbehaving component.
 
-![Processes Tab - application_controller](assets/process-application-controller.png)
+![Processes Tab - application_controller]({{ '/assets/posts/2024-02-01-an-example-of-debugging-with-erl-crash-dump/process-application-controller.png' | relative_url }})
 
 ### Step 3: Examining the Stack Trace
 
 After selecting the `application_controller` process, I examined its stack trace. 
 
-![application_controller - Stack Dump](assets/stack-dump.png)
+![application_controller - Stack Dump]({{ '/assets/posts/2024-02-01-an-example-of-debugging-with-erl-crash-dump/stack-dump.png' | relative_url }})
 
 This is where the clue emerged. The stack trace included the following message:
 
+{% raw %}
 ```
 "{application_start_failure,adwell,{{shutdown,{failed_to_start_child,'Elixir.Oban',{'EXIT',{#{message => <<\"invalid value for :plugins, invalid value for :crontab, MyApp.InvalidWorker not found or can't be loaded\">>,'__struct__' => 'Elixir.ArgumentError','__exception__' => true},[{'Elixir.Oban.Config',new,1,[{file,\"lib/oban/config.ex\"},{line,99}]},{'Elixir.Oban',start_link,1,[{file,\"lib/oban.ex\"},{line,464}]},{supervisor,do_start_child_i,3,[{file,\"supervisor.erl\"},{line,959}]},{supervisor,do_start_child,3,[{file,\"supervisor.erl\"},{line,945}]},{supervisor,'-start_children/2-fun-0-',3,[{file,\"supervisor.erl\"},{line,929}]},{supervisor,children_map,4,[{file,\"supervisor.erl\"},{line,1820}]},{supervisor,init_children,2,[{file,\"supervisor.erl\"},{line,889}]},{gen_server,init_it,2,[{file,\"gen_server.erl\"},{line,2229}]}]}}}},{'Elixir.Adwell.Application',start,[normal,[]]}}}"
 ```
+{% endraw %}
 
 This error message was immediately revealing: it indicated that there was an invalid value provided for the `:crontab` option in the plugins configuration for Oban:
 
