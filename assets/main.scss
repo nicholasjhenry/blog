@@ -1,0 +1,172 @@
+---
+# Front matter is required so Jekyll processes this file.
+# Variable overrides must come before the minima import.
+---
+
+$base-font-family: Charter, "Iowan Old Style", Georgia, Cambria, "Times New Roman", serif;
+$base-font-size:   19px;
+$base-line-height: 1.7;
+$spacing-unit:     32px;
+
+$text-color:       #1c1c1c;
+$background-color: #fffdfa;
+$brand-color:      #1f5c4d;
+$grey-color:       #6b6b6b;
+
+$content-width:    720px;
+$on-palm:          600px;
+$on-laptop:        720px;
+
+@import "minima";
+
+// ---------------------------------------------------------------------------
+// Refinements on top of minima. Restraint is the point -- typography and
+// spacing only, no ornament.
+// ---------------------------------------------------------------------------
+
+$rule-color: #e8e4dd;
+
+body {
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+a {
+  text-decoration-thickness: 1px;
+  text-underline-offset: 2px;
+}
+
+// Headings sit closer to their own text and further from what precedes them.
+h1, h2, h3, h4, h5, h6 {
+  line-height: 1.25;
+  letter-spacing: -0.011em;
+  margin-top: $spacing-unit * 1.4;
+  margin-bottom: $spacing-unit * 0.4;
+}
+
+h1 { font-size: 1.9em; }
+h2 { font-size: 1.4em; }
+h3 { font-size: 1.15em; }
+
+// Header and footer: hairlines, not slabs.
+.site-header {
+  border-top: none;
+  border-bottom: 1px solid $rule-color;
+  min-height: 0;
+  padding: $spacing-unit * 0.7 0;
+}
+
+.site-title,
+.site-title:visited {
+  color: $text-color;
+  font-weight: 600;
+  letter-spacing: -0.015em;
+
+  &:hover { text-decoration: none; }
+}
+
+.site-nav .page-link { color: $grey-color; }
+
+.site-footer {
+  border-top: 1px solid $rule-color;
+  padding: $spacing-unit 0;
+}
+
+.footer-heading { display: none; }
+
+.site-footer,
+.post-meta {
+  font-size: 0.78em;
+  color: $grey-color;
+}
+
+// Dates read as small caps rather than body text.
+.post-meta {
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+// Home page listing.
+.post-list > li {
+  margin-bottom: $spacing-unit * 1.6;
+  padding-bottom: $spacing-unit * 0.4;
+}
+
+.post-list h3 {
+  margin: 0.15em 0 0.35em;
+  font-size: 1.35em;
+}
+
+.post-link,
+.post-link:visited {
+  color: $text-color;
+
+  &:hover {
+    color: $brand-color;
+    text-decoration: none;
+  }
+}
+
+.post-excerpt {
+  margin: 0;
+  color: #545454; // was lighten($text-color, 22%); literal avoids the deprecated global function
+}
+
+.post-title {
+  margin-top: 0;
+  line-height: 1.15;
+}
+
+.rss-subscribe {
+  margin-top: $spacing-unit * 1.5;
+  padding-top: $spacing-unit * 0.75;
+  border-top: 1px solid $rule-color;
+  font-size: 0.85em;
+  color: $grey-color;
+}
+
+// Code: quiet and monochrome. Minima ships a blue tint and a hard border.
+pre, code {
+  font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+  font-size: 0.82em;
+  background-color: #f5f3ef;
+  border: none;
+  border-radius: 4px;
+}
+
+code { padding: 0.15em 0.35em; }
+
+pre {
+  padding: $spacing-unit * 0.6;
+  line-height: 1.55;
+
+  > code {
+    padding: 0;
+    background: none;
+  }
+}
+
+// Upright, not italic with negative tracking.
+blockquote {
+  font-size: 1em;
+  font-style: normal;
+  letter-spacing: normal;
+  color: $grey-color-dark;
+  border-left: 3px solid $brand-color;
+  padding-left: $spacing-unit * 0.6;
+}
+
+.post-content img {
+  display: block;
+  margin: $spacing-unit auto;
+  border-radius: 4px;
+}
+
+// "Originally published at" notice, rendered by the post layout override.
+.post-canonical {
+  margin-top: $spacing-unit * 1.5;
+  padding-top: $spacing-unit * 0.75;
+  border-top: 1px solid $rule-color;
+  font-size: 0.85em;
+  color: $grey-color;
+}

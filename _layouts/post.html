@@ -1,0 +1,38 @@
+---
+layout: default
+---
+{%- comment -%}
+  Overrides minima's post layout to surface the canonical link. Posts here are
+  mirrors; a reader landing on this site should have a path to the original.
+{%- endcomment -%}
+<article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
+
+  <header class="post-header">
+    <h1 class="post-title p-name" itemprop="name headline">{{ page.title | escape }}</h1>
+    <p class="post-meta">
+      <time class="dt-published" datetime="{{ page.date | date_to_xmlschema }}" itemprop="datePublished">
+        {%- assign date_format = site.minima.date_format | default: "%b %-d, %Y" -%}
+        {{ page.date | date: date_format }}
+      </time>
+      {%- if page.author -%}
+        • <span itemprop="author" itemscope itemtype="http://schema.org/Person"><span class="p-author h-card" itemprop="name">{{ page.author }}</span></span>
+      {%- endif -%}</p>
+  </header>
+
+  <div class="post-content e-content" itemprop="articleBody">
+    {{ content }}
+  </div>
+
+  {%- if page.canonical_url -%}
+    {%- assign canonical_host = page.canonical_url | split: "//" | last | split: "/" | first -%}
+    <p class="post-canonical">
+      Originally published at <a href="{{ page.canonical_url }}">{{ canonical_host }}</a>.
+    </p>
+  {%- endif -%}
+
+  {%- if site.disqus.shortname -%}
+    {%- include disqus_comments.html -%}
+  {%- endif -%}
+
+  <a class="u-url" href="{{ page.url | relative_url }}" hidden></a>
+</article>

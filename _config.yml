@@ -1,8 +1,18 @@
 title: Nicholas Henry
+# Placeholder tagline -- feeds the footer and the SEO meta description. Worth a my-voice pass.
+description: Field notes on Elixir, Phoenix, and domain modeling.
+author: Nicholas Henry
+github_username: nicholasjhenry
 url: https://nicholasjhenry.github.io
 baseurl: /blog
 theme: minima
+minima:
+  date_format: "%B %-d, %Y"
 plugins: [jekyll-feed, jekyll-seo-tag, jekyll-sitemap]
+sass:
+  # minima 2.5.2 uses @import and lighten()/darken(), both deprecated in Dart Sass.
+  # Silence warnings from the theme; warnings from assets/main.scss still surface.
+  quiet_deps: true
 exclude:
   # Jekyll's built-in exclude list is replaced, not extended, so restore it here.
   - .jekyll-cache/

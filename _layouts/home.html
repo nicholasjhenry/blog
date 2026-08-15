@@ -1,0 +1,38 @@
+---
+layout: default
+---
+{%- comment -%}
+  Overrides minima's home layout. Minima's `show_excerpts` emits the post's
+  first block verbatim, which for banner-image posts is just the image. This
+  builds a uniform text excerpt from the content instead.
+{%- endcomment -%}
+<div class="home">
+  {%- if page.title -%}
+    <h1 class="page-heading">{{ page.title }}</h1>
+  {%- endif -%}
+
+  {{ content }}
+
+  {%- if site.posts.size > 0 -%}
+    <ul class="post-list">
+      {%- for post in site.posts -%}
+      <li>
+        {%- assign date_format = site.minima.date_format | default: "%b %-d, %Y" -%}
+        <span class="post-meta">{{ post.date | date: date_format }}</span>
+        <h3>
+          <a class="post-link" href="{{ post.url | relative_url }}">
+            {{ post.title | escape }}
+          </a>
+        </h3>
+        {%- comment -%} Cut at the first subheading so heading text doesn't bleed in. {%- endcomment -%}
+        <p class="post-excerpt">
+          {{- post.content | split: "<h2" | first | strip_html | normalize_whitespace | truncatewords: 34 -}}
+        </p>
+      </li>
+      {%- endfor -%}
+    </ul>
+
+    <p class="rss-subscribe">Subscribe <a href="{{ "/feed.xml" | relative_url }}">via RSS</a></p>
+  {%- endif -%}
+
+</div>
