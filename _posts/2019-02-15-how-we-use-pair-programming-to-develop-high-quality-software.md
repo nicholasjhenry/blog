@@ -35,7 +35,7 @@ However, even though it’s disciplined, pair programming isn’t rigid; in fact
 brainstorming. The pair approach works particularly well for parts of the development process that
 allow some creative license and must be clear to many people such as defining names and concepts.
 
-![Hugo Frappier (navigating) and Nicolas Charlery (driving) during a pair programming session](./assets/example.png)
+![Hugo Frappier (navigating) and Nicolas Charlery (driving) during a pair programming session](/assets/posts/2019-02-15-how-we-use-pair-programming-to-develop-high-quality-software/example.png)
 
 ## Pair programming continuously transfers knowledge
 

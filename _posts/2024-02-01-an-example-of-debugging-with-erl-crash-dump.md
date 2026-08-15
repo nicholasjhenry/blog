@@ -1,6 +1,6 @@
 # Debugging with `erl_crash.dump`: A Practical Example from the Field
 
-![Banner](./assets/erl_crash_banner.webp)
+![Banner](/assets/post/2024-02-01-an-example-of-debugging-with-erl-crash-dump/erl_crash_banner.webp)
 
 When working with Elixir releases in Docker, even small misconfigurations can cause crashes. Recently, I encountered an issue that perfectly illustrates how the `erl_crash.dump` can help pinpoint the problem. Here’s what happened:
 
@@ -38,13 +38,13 @@ But why is the `application_controller` a good place to start?
 - **Early Indicator:** Since the crash occurred during application boot-up, examining the `application_controller` process often gives you insight into what failed to start correctly.
 - **Stack Trace Clarity:** The stack trace associated with this process typically contains detailed information on the initialization flow, helping to pinpoint the misbehaving component.
 
-![Processes Tab - application_controller](assets/process-application-controller.png)
+![Processes Tab - application_controller](/assets/posts/2024-02-01-an-example-of-debugging-with-erl-crash-dumerl_crash_bannerp/process-application-controller.png)
 
 ### Step 3: Examining the Stack Trace
 
 After selecting the `application_controller` process, I examined its stack trace. 
 
-![application_controller - Stack Dump](assets/stack-dump.png)
+![application_controller - Stack Dump](/assets/posts/2024-02-01-an-example-of-debugging-with-erl-crash-dump/stack-dump.png)
 
 This is where the clue emerged. The stack trace included the following message:
 

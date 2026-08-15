@@ -5,9 +5,9 @@ published_url: https://nicholasjhenry.medium.com/building-isolated-phoenix-works
 
 # Building Isolated Phoenix Workspaces for AI Agents with Conductor
 
-[Banner](./assets/conductor.png)
+![Banner](/assets/posts/2025-10-29-building-isolated-phoenix-workspaces-for-ai-agents-with-conductor/conductor.png)
 
-I’ve been experimenting with agentic coding — letting AI agents handle multiple tasks in parallel across my codebase. The promise is compelling: one agent refactors authentication, another builds a new dashboard feature, a third optimizes database queries, all working simultaneously. But I quickly realised the infrastructure requirements.
+I’ve been experimenting with agentic cerl_crash_banneroding — letting AI agents handle multiple tasks in parallel across my codebase. The promise is compelling: one agent refactors authentication, another builds a new dashboard feature, a third optimizes database queries, all working simultaneously. But I quickly realised the infrastructure requirements.
 
 The core challenge became clear: AI agents can easily work on five features at once, but traditional development environments assume a single developer working on one branch at a time. Without proper isolation, I’d face inevitable conflicts — shared database state, port conflicts, Docker container collisions.
 
