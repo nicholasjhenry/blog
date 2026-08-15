@@ -7,12 +7,23 @@ url: https://nicholasjhenry.github.io
 baseurl: /blog
 theme: minima
 minima:
-  date_format: "%B %-d, %Y"
+  # Short form: dates are set as monospace stamps, and the home index rules them
+  # off in a narrow gutter where the full month name would wrap.
+  date_format: "%b %-d, %Y"
 plugins: [jekyll-feed, jekyll-seo-tag, jekyll-sitemap]
 sass:
   # minima 2.5.2 uses @import and lighten()/darken(), both deprecated in Dart Sass.
-  # Silence warnings from the theme; warnings from assets/main.scss still surface.
+  # quiet_deps covers the theme's own partials, loaded from the gem's load path.
   quiet_deps: true
+  # It does not cover assets/main.scss, which is the entrypoint rather than a
+  # dependency, so its `@import "minima"` warns on every build and rebuild.
+  #
+  # The migration Dart Sass wants -- `@use "minima" with (...)` -- is not
+  # available here. GitHub Pages builds this site with Jekyll 3.10, whose
+  # jekyll-sass-converter 1.x runs SassC/libsass, and libsass never implemented
+  # the module system. `@use` would compile locally and fail to deploy. Silence
+  # the warning until Pages moves off libsass or this repo builds via Actions.
+  silence_deprecations: [import]
 exclude:
   # Jekyll's built-in exclude list is replaced, not extended, so restore it here.
   - .jekyll-cache/

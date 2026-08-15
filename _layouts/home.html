@@ -11,6 +11,11 @@ layout: default
     <h1 class="page-heading">{{ page.title }}</h1>
   {%- endif -%}
 
+  {%- comment -%}
+    No tagline here -- the site description now runs under the masthead on every
+    page, and repeating it directly below would print the same sentence twice.
+  {%- endcomment -%}
+
   {{ content }}
 
   {%- if site.posts.size > 0 -%}

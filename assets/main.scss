@@ -20,11 +20,19 @@ $on-laptop:        720px;
 @import "minima";
 
 // ---------------------------------------------------------------------------
-// Refinements on top of minima. Restraint is the point -- typography and
-// spacing only, no ornament.
+// Refinements on top of minima.
+//
+// The site describes itself as field notes, so the theme is built to read as a
+// working notebook: serif prose on paper stock, every piece of metadata stamped
+// in monospace, and entries separated by ruled hairlines. Restraint is the
+// point -- typography, rules, and spacing only, no ornament.
 // ---------------------------------------------------------------------------
 
-$rule-color: #e8e4dd;
+$mono-font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+
+$rule-color:   #e5e0d7; // ruled lines on the paper
+$ledger-width: 112px;   // date gutter on the home index
+$ledger-gap:   28px;
 
 body {
   -webkit-font-smoothing: antialiased;
@@ -34,6 +42,26 @@ body {
 a {
   text-decoration-thickness: 1px;
   text-underline-offset: 2px;
+}
+
+::selection {
+  background: rgba(31, 92, 77, 0.14);
+}
+
+hr {
+  border: 0;
+  border-top: 1px solid $rule-color;
+  margin: $spacing-unit * 1.5 0;
+}
+
+// Anything that annotates rather than narrates -- dates, notices, captions --
+// is set in monospace. It marks the difference between the note and the record.
+%stamp {
+  font-family: $mono-font-family;
+  font-size: 0.72em;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.01em;
+  color: $grey-color;
 }
 
 // Headings sit closer to their own text and further from what precedes them.
@@ -53,19 +81,52 @@ h3 { font-size: 1.15em; }
   border-top: none;
   border-bottom: 1px solid $rule-color;
   min-height: 0;
-  padding: $spacing-unit * 0.7 0;
+  padding: $spacing-unit * 0.8 0;
+}
+
+// Minima floats the masthead and the nav against each other and props the
+// header open with a 73px line-height. A flex row does the same job without the
+// dead vertical space, and lets the name and subtitle stack as one block.
+.site-header .wrapper {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  column-gap: $spacing-unit;
+
+  // Minima's clearfix would otherwise count as a third flex item.
+  &::after { display: none; }
 }
 
 .site-title,
 .site-title:visited {
-  color: $text-color;
+  float: none;
+  display: block;
+  font-size: 1.3em;
+  line-height: 1.25;
   font-weight: 600;
   letter-spacing: -0.015em;
+  color: $text-color;
 
   &:hover { text-decoration: none; }
 }
 
-.site-nav .page-link { color: $grey-color; }
+// Says what the notebook is for on every page, not just the home index -- most
+// readers arrive on a post, not the front door.
+.site-subtitle {
+  @extend %stamp;
+  margin: 0.3em 0 0;
+}
+
+.site-nav {
+  float: none;
+  line-height: $base-line-height;
+}
+
+.site-nav .page-link {
+  @extend %stamp;
+  font-size: 0.8em; // the nav sits at body size, so scale against that instead
+}
 
 .site-footer {
   border-top: 1px solid $rule-color;
@@ -74,27 +135,31 @@ h3 { font-size: 1.15em; }
 
 .footer-heading { display: none; }
 
-.site-footer,
-.post-meta {
-  font-size: 0.78em;
-  color: $grey-color;
+// Minima sets an absolute font-size on the column wrapper, so the stamp has to
+// land there rather than on .site-footer to take effect.
+.site-footer .footer-col-wrapper { @extend %stamp; }
+
+.post-meta { @extend %stamp; }
+
+// ---------------------------------------------------------------------------
+// The index reads as a ledger: dates ruled off in the left gutter, one entry
+// per line of the page.
+// ---------------------------------------------------------------------------
+
+.post-list {
+  margin-left: 0;
+  border-top: 1px solid $rule-color;
 }
 
-// Dates read as small caps rather than body text.
-.post-meta {
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-}
-
-// Home page listing.
 .post-list > li {
-  margin-bottom: $spacing-unit * 1.6;
-  padding-bottom: $spacing-unit * 0.4;
+  margin-bottom: 0;
+  padding: $spacing-unit * 0.9 0;
+  border-bottom: 1px solid $rule-color;
 }
 
 .post-list h3 {
-  margin: 0.15em 0 0.35em;
-  font-size: 1.35em;
+  margin: 0.1em 0 0.3em;
+  font-size: 1.3em;
 }
 
 .post-link,
@@ -109,7 +174,29 @@ h3 { font-size: 1.15em; }
 
 .post-excerpt {
   margin: 0;
+  font-size: 0.94em;
   color: #545454; // was lighten($text-color, 22%); literal avoids the deprecated global function
+}
+
+// Below this width the gutter would starve the excerpt, so the date simply
+// stacks above the title.
+@media screen and (min-width: 820px) {
+  .post-list > li {
+    display: grid;
+    grid-template-columns: $ledger-width 1fr;
+    column-gap: $ledger-gap;
+  }
+
+  .post-list .post-meta {
+    grid-column: 1;
+    grid-row: 1 / span 2;
+    padding-top: 0.55em; // optically aligns the stamp with the title's x-height
+  }
+
+  .post-list h3,
+  .post-list .post-excerpt {
+    grid-column: 2;
+  }
 }
 
 .post-title {
@@ -118,26 +205,26 @@ h3 { font-size: 1.15em; }
 }
 
 .rss-subscribe {
-  margin-top: $spacing-unit * 1.5;
-  padding-top: $spacing-unit * 0.75;
-  border-top: 1px solid $rule-color;
-  font-size: 0.85em;
-  color: $grey-color;
+  @extend %stamp;
+  margin-top: $spacing-unit * 1.25;
 }
 
 // Code: quiet and monochrome. Minima ships a blue tint and a hard border.
 pre, code {
-  font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+  font-family: $mono-font-family;
   font-size: 0.82em;
   background-color: #f5f3ef;
   border: none;
-  border-radius: 4px;
+  border-radius: 0;
 }
 
 code { padding: 0.15em 0.35em; }
 
+// Listings are pasted into the notebook, so they get a margin rule rather than
+// a floating panel.
 pre {
-  padding: $spacing-unit * 0.6;
+  padding: $spacing-unit * 0.6 $spacing-unit * 0.7;
+  border-left: 2px solid $rule-color;
   line-height: 1.55;
 
   > code {
@@ -146,27 +233,27 @@ pre {
   }
 }
 
-// Upright, not italic with negative tracking.
+// Upright, not italic with negative tracking -- a quoted note, not a pull quote.
 blockquote {
   font-size: 1em;
   font-style: normal;
   letter-spacing: normal;
   color: $grey-color-dark;
-  border-left: 3px solid $brand-color;
+  border-left: 2px solid $brand-color;
   padding-left: $spacing-unit * 0.6;
 }
 
 .post-content img {
   display: block;
   margin: $spacing-unit auto;
-  border-radius: 4px;
+  border: 1px solid $rule-color;
+  border-radius: 0;
 }
 
 // "Originally published at" notice, rendered by the post layout override.
 .post-canonical {
+  @extend %stamp;
   margin-top: $spacing-unit * 1.5;
   padding-top: $spacing-unit * 0.75;
   border-top: 1px solid $rule-color;
-  font-size: 0.85em;
-  color: $grey-color;
 }
