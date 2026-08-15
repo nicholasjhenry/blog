@@ -1,0 +1,4 @@
+title: Nicholas Henry
+theme: minima
+plugins: [jekyll-feed, jekyll-seo-tag, jekyll-sitemap]
+exclude: [drafts/, README.md]
