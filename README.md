@@ -18,7 +18,7 @@ is installed system-wide.
 ```bash
 mise trust        # once per clone, to allow mise.toml
 bundle install
-bundle exec jekyll serve
+bundle exec jekyll serve --incremental
 ```
 
 Then open <http://127.0.0.1:4000/blog/>.
