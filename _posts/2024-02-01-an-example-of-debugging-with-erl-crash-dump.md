@@ -1,5 +1,5 @@
 ---
-title: "Debugging with `erl_crash.dump`: A Practical Example from the Field"
+title: "Debugging with erl_crash.dump: A Practical Example from the Field"
 ---
 
 ![Banner]({{ '/assets/posts/2024-02-01-an-example-of-debugging-with-erl-crash-dump/erl_crash_banner.webp' | relative_url }})
