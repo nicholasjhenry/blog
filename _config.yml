@@ -1,4 +1,23 @@
 title: Nicholas Henry
+url: https://nicholasjhenry.github.io
+baseurl: /blog
 theme: minima
 plugins: [jekyll-feed, jekyll-seo-tag, jekyll-sitemap]
-exclude: [drafts/, README.md]
+exclude:
+  # Jekyll's built-in exclude list is replaced, not extended, so restore it here.
+  - .jekyll-cache/
+  - .sass-cache/
+  - vendor/
+  - Gemfile
+  - Gemfile.lock
+  # Repo-specific
+  - drafts/
+  - tmp/
+  - README.md
+  - CLAUDE.local.md
+defaults:
+  - scope:
+      path: ""
+      type: posts
+    values:
+      layout: post

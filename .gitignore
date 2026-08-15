@@ -1,1 +1,4 @@
 /tmp
+_site
+.jekyll-cache
+vendor/
