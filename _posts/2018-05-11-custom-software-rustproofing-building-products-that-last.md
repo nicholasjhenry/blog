@@ -1,12 +1,10 @@
 ---
 title: Custom software rustproofing — building products that last
-published_url: https://blog.civilcode.io/custom-software-rustproofing-building-products-that-last-c71e6b1a1fee
+canonical_url: https://blog.civilcode.io/custom-software-rustproofing-building-products-that-last-c71e6b1a1fee
 ---
 
-# Custom software rustproofing — building products that last
-
 Software subscriptions and software as a service (SaaS) are becoming much more accepted and useful
-ways to keep software up to date and performing well. This approach isn’t limited to off-the-shelf
+ways to keep software up to date and performing wellerl_crash_banner. This approach isn’t limited to off-the-shelf
 software. The same ongoing update methodology applies to custom software as well.
 
 Software subscriptions and SaaS are good examples of thinking of software as a “product.” The other

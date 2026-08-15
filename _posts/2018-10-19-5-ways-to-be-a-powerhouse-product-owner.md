@@ -1,9 +1,7 @@
 ---
 title: 5 ways to be a powerhouse product owner
-published_url: https://blog.civilcode.io/5-ways-to-be-a-powerhouse-product-owner-2064acf40d2c
+canonical_url: https://blog.civilcode.io/5-ways-to-be-a-powerhouse-product-owner-2064acf40d2c
 ---
-
-# 5 ways to be a powerhouse product owner
 
 In the software development world, a product owner is someone who takes responsibility for the
 success of a project from the customer’s viewpoint. An effective product owner will be able to
