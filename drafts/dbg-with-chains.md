@@ -76,3 +76,7 @@ If you take Dave's wider advice, Credo's [`Refactor.WithClauses`](https://credo.
 ## Try this
 
 Find a function with two or three `=` assignments leading into a `case`. Rewrite it as a `with`. Pipe the result into `dbg()` and run it against the input you want to trace. See whether the output tells you what you need without a single inspect call.
+
+## Acknowledgment
+
+I used AI assistance to draft and edit this post. The ideas are my own. The argument, the examples, and the recommendation came out of my own work, and I stand behind them. The tool helped me get them onto the page.
