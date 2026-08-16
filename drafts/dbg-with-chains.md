@@ -2,8 +2,6 @@
 title: dbg/1 adds a new reason to use `with` more often
 ---
 
-# dbg/1 adds a new reason to use `with` more often
-
 Wrap `dbg()` around a `with` chain and Elixir doesn't return one value. It walks the chain and prints every clause beside its matched value, with a marker on the one that failed.
 
 That behavior is the operational case for an argument Dave Thomas made in 2016. In [Over-using `with` in Elixir 1.2](https://pragdave.github.io/blog/2016/02/23/over-using-with-in-elixir-1-dot-2.html), his thesis was: reach for `with` *more* than strictly necessary, not just for chained `{:ok, _}` returns. Every time you create a function-level local, try fitting it into a `with`. The pressure to do so, he wrote, "drives me to create simpler, single-purpose functions."
