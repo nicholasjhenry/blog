@@ -32,7 +32,6 @@ exclude:
   - Gemfile
   - Gemfile.lock
   # Repo-specific
-  - drafts/
   - tmp/
   - README.md
   - CLAUDE.local.md
