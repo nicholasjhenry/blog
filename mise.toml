@@ -1,2 +1,27 @@
 [tools]
 ruby = "3.4.10"
+
+[tasks.install]
+description = "Install gems into vendor/bundle"
+run = "bundle install"
+sources = ["Gemfile", "Gemfile.lock"]
+outputs = { auto = true }
+
+[tasks.serve]
+description = "Serve the site at http://127.0.0.1:4000/blog/"
+depends = ["install"]
+run = "bundle exec jekyll serve"
+
+[tasks.drafts]
+description = "Serve with _drafts included, dated from file mtime"
+depends = ["install"]
+run = "bundle exec jekyll serve --drafts"
+
+[tasks.build]
+description = "Build the site; run before pushing to catch Liquid errors"
+depends = ["install"]
+run = "bundle exec jekyll build"
+
+[tasks.clean]
+description = "Remove the built site and the incremental cache"
+run = "rm -rf _site .jekyll-cache"
