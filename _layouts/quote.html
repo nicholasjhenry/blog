@@ -1,0 +1,35 @@
+---
+layout: post
+---
+{%- comment -%}
+  A quote post: the passage is the entry, and anything in the body is a note
+  written underneath it.
+
+  This nests inside the `post` layout rather than `default`, so the header,
+  date stamp, and "originally published at" notice stay in one place. What is
+  rendered here lands inside `.post-content`.
+
+  Frontmatter:
+    quote        the passage; Markdown, `|` for more than one paragraph
+    attribution  who or what it came from (optional)
+    source_url   link for the attribution (optional)
+
+  With no `quote` set, the layout is the post layout -- write the blockquote
+  in the body instead.
+{%- endcomment -%}
+{%- if page.quote -%}
+  <blockquote class="quote">
+    {{ page.quote | markdownify }}
+    {%- if page.attribution -%}
+      <footer class="quote-attribution">
+        &mdash;&nbsp;
+        {%- if page.source_url -%}
+          <cite><a href="{{ page.source_url }}">{{ page.attribution | escape }}</a></cite>
+        {%- else -%}
+          <cite>{{ page.attribution | escape }}</cite>
+        {%- endif -%}
+      </footer>
+    {%- endif -%}
+  </blockquote>
+{%- endif -%}
+{{ content }}
