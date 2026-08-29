@@ -27,7 +27,10 @@ A few things worth knowing:
 
 * The `/blog/` path is required. `baseurl` is set in `_config.yml`, so the bare root returns a 404.
 * `bundle exec jekyll serve` rebuilds on save, but not for changes to `_config.yml` — restart for those.
-* Posts in `drafts/` are excluded from the build and will not appear.
+* `--incremental` does not regenerate the home index when a post or draft is added, so a new entry
+  appears at its own URL but not in the list on the front page. Drop the flag when adding a post.
+* Posts in `_drafts/` are skipped by the build and will not appear. Preview them with
+  `bundle exec jekyll serve --drafts`, which dates each one from its file modification time.
 * The build prints Dart Sass deprecation warnings from the minima theme. They are expected and can be
   ignored.
 
