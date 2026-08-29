@@ -25,3 +25,36 @@ run = "bundle exec jekyll build"
 [tasks.clean]
 description = "Remove the built site and the incremental cache"
 run = "rm -rf _site .jekyll-cache"
+
+[tasks.new]
+description = "Create a dated draft in _drafts from a title"
+usage = 'arg "[title]" help="Headline for the post; prompted for if omitted"'
+run = '''
+title="$usage_title"
+if [ -z "$title" ]; then
+  printf 'Post title: '
+  read -r title
+fi
+if [ -z "$title" ]; then
+  echo "A title is required." >&2
+  exit 1
+fi
+
+slug=$(printf '%s' "$title" \
+  | tr '[:upper:]' '[:lower:]' \
+  | sed -E 's/[^a-z0-9]+/-/g; s/^-+//; s/-+$//')
+file="_drafts/$(date +%F)-${slug}.md"
+
+if [ -e "$file" ]; then
+  echo "$file already exists." >&2
+  exit 1
+fi
+
+cat > "$file" <<EOF
+---
+title: ${title}
+---
+EOF
+
+echo "Created $file"
+'''
