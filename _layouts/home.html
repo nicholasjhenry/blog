@@ -29,9 +29,17 @@ layout: default
             {{ post.title | escape }}
           </a>
         </h3>
-        {%- comment -%} Cut at the first subheading so heading text doesn't bleed in. {%- endcomment -%}
+        {%- comment -%}
+          A quote post keeps its passage in frontmatter, so its body holds only
+          the note underneath -- often nothing at all. Excerpt the quote itself.
+        {%- endcomment -%}
         <p class="post-excerpt">
-          {{- post.content | split: "<h2" | first | strip_html | normalize_whitespace | truncatewords: 34 -}}
+          {%- if post.quote -%}
+            {{- post.quote | markdownify | strip_html | normalize_whitespace | truncatewords: 34 -}}
+          {%- else -%}
+            {%- comment -%} Cut at the first subheading so heading text doesn't bleed in. {%- endcomment -%}
+            {{- post.content | split: "<h2" | first | strip_html | normalize_whitespace | truncatewords: 34 -}}
+          {%- endif -%}
         </p>
       </li>
       {%- endfor -%}

@@ -243,6 +243,28 @@ blockquote {
   padding-left: $spacing-unit * 0.6;
 }
 
+// On a quote post the passage is the entry rather than something quoted inside
+// one, so it is set a step up from body text and given room above the note that
+// follows. Same rule and same colour as any other blockquote -- larger, not
+// louder.
+.quote {
+  margin-bottom: $spacing-unit * 1.2;
+  font-size: 1.16em;
+  line-height: 1.5;
+  color: $text-color;
+
+  > :last-child { margin-bottom: 0; }
+}
+
+.quote-attribution {
+  @extend %stamp;
+  display: block;
+  margin-top: $spacing-unit * 0.5;
+  font-size: 0.62em; // the quote sets 1.16em, so scale against that, not the body
+
+  cite { font-style: normal; }
+}
+
 .post-content img {
   display: block;
   margin: $spacing-unit auto;
