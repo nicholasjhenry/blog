@@ -1,8 +1,6 @@
 ---
-title: Controls: ship the floor model with your library
+title: "Controls: ship the floor model with your library"
 ---
-
-# Controls: ship the floor model with your library
 
 You join an unfamiliar Elixir codebase and open a module you need to use. You run `h MyApp.Registry` in IEx. The docs tell you the function names, the arguments, the return types. They don't tell you the one thing you actually came for: what does it look like to use this correctly?
 
@@ -28,48 +26,69 @@ Think of a control as the floor model in a showroom. Not a spec sheet, not a pho
 
 Tests are the floor model locked in the stockroom. Same unit, same working order, but behind a door marked `test/` that customers don't open. Controls move it onto the floor. You put the example where the user is, in `lib/`, and you write it so they can turn it on.
 
-The Anoma project does exactly this. Their codebase carries a whole `lib/examples/` tree alongside the implementation. Here's a trimmed control from their registry examples:
+Here's a control for the registry's address, the object the opening story had to dig out of `test/`. It lives at `lib/my_app/controls/registry/address.ex`, the path that mirrors `MyApp.Registry.Address`:
 
 ```elixir
-defmodule Anoma.Node.Examples.ERegistry do
-  alias Anoma.Node.Registry
-  alias Anoma.Node.Registry.Address
+defmodule MyApp.Controls.Registry.Address do
+  alias MyApp.Registry
 
-  import ExUnit.Assertions
+  def node_id, do: "some node id"
+  def engine, do: :some_engine
 
-  @doc """
-  I create an address for a given node id and module.
-  I assert that the address is created correctly.
-  """
-  def create_address() do
-    node_id = "londo_mollari" <> Base.url_encode64(:crypto.strong_rand_bytes(16))
-
-    address = Registry.address(node_id, :module)
-
-    assert address == %Address{label: nil, engine: :module, node_id: node_id}
-
-    address
+  def example do
+    Registry.address(node_id(), engine())
   end
 end
 ```
 
-Read what that function does. It builds a real address the canonical way. It asserts the result is what the library promises. Then it returns the address -- a useful object, not `nil`.
+The control builds the address the way the library means it to be built, through `Registry.address/2`. Its values are fixed, so every call returns the same address. And it returns the object, not `nil`.
 
-That return value is the whole point. Call `ERegistry.create_address()` in IEx and you get a live `Address` struct to inspect, pass into the next function, or use as a fixture. The same function that proves the code is correct also hands you something to build with. Anoma's contributor guide leans on this directly: to understand a module, you open its example file and run it line by line, watching the real data move through `:observer`.
+Call it in IEx and you have a live address to inspect or pass into the next function:
+
+```elixir
+iex> MyApp.Controls.Registry.Address.example()
+%MyApp.Registry.Address{label: nil, engine: :some_engine, node_id: "some node id"}
+```
+
+The fixed values are what let a test build on it. A test in code that depends on the registry takes the control's address, then compares its result with the control's own value:
+
+```elixir
+test "routes a message to the address's node" do
+  control_address = MyApp.Controls.Registry.Address.example()
+
+  {:remote, node_id} = Router.route(control_address)
+
+  assert node_id == MyApp.Controls.Registry.Address.node_id()
+end
+```
+
+The test never repeats a literal id. When the control changes, the test follows it.
+
+The Anoma project takes a related approach it calls examples over testing. Its example functions build an object, assert that it's correct, and return it, so the example is also the test. A control leaves the assertion to the test and keeps its values fixed, which is what lets other code build on it.
 
 ## What a control does that a test can't
 
-A control earns its place in `lib/` by doing four jobs at once. The Eventide definition lists them, and they map cleanly onto the daily friction of working in someone else's code.
+The Eventide definition gives a control two roles and three uses. The roles help a reader understand the library. The uses put the control to work in running code.
 
-**Reference.** It shows the intended usage pattern in executable form. Not "here's the function signature" but "here's how the function is meant to be called, and what comes back."
+As a **reference**, the control shows how the object is meant to be built and what comes back. Not the function signature, but the call.
 
-**Affordance.** It makes the design intent discoverable. A reader scanning `lib/examples/` sees the shape of the library the author had in mind, the same way a handle tells you a door is meant to be pulled.
+As an **affordance**, it makes the design intent discoverable. A reader scanning `lib/my_app/controls/` sees which objects the author expects them to build, and what each one looks like.
 
-**Fixture.** Because it returns a useful object, code that depends on the library can call the control to get realistic data instead of hand-rolling it. Your example becomes your test data.
+The first use is **exercising code that uses the library**. A consumer's test takes the control's value instead of hand-rolling its own, as the router test above does. The library states once what a valid address looks like, and every project that depends on it agrees.
 
-**Diagnostic.** When something breaks in production, you run the control in a console and watch where it fails. A smoke test you already wrote, sitting where you need it.
+The second is **demo data**. A seed script calls the controls and saves the values through the library's own functions, so the demo shows the objects the library calls canonical.
 
-A test does the first of these accidentally and the rest not at all.
+The third is **diagnostics**. When something breaks in production, you run the control through the failing code in a remote console and watch where it fails. It's a known input you already wrote, sitting where you need it.
+
+A test serves the reference role by accident, and the rest not at all.
+
+## Isn't that what doctests are for?
+
+A doctest puts a runnable example next to the function, and for a pure function that's often all the example a reader needs. `Registry.address/2` could carry one.
+
+But the doctest's address exists only inside its `iex>` block. The router test can't call it, a seed script can't call it, and neither can a remote console in production. A doctest shows the reader the object. A control hands the object to the reader's code.
+
+The two don't compete. The doctest shows the call, and the control is the value everything else builds on.
 
 ## The trade-offs, honestly
 
@@ -77,18 +96,16 @@ Controls are not free, and a few of the costs are real.
 
 They ship in your `lib/`, which means they compile into your application and travel to production. For most projects that's a rounding error. If you're shipping a constrained artifact, it's a line item you'll want to look at.
 
-That example above imports `ExUnit.Assertions` into a library module. Pulling a test framework into `lib/` reads as strange the first time you see it, and it should -- you're deciding that the assertion belongs next to the code it describes rather than across the `test/` boundary. It's a defensible call, but it's a call.
-
 And controls are code. They need maintenance like any other code. An example that has drifted from the library is worse than no example, because it lies with the authority of something that compiles.
 
-This isn't an argument to delete your test suite. ExUnit still owns coverage, edge cases, regression, and CI. Controls own the canonical example -- the happy-path demonstration of how an object is meant to be used. The two overlap, and that overlap is fine. When you get back to the office on Monday, you shouldn't start moving every test into `lib/examples/`. You should pick one.
+This isn't an argument to delete your test suite. ExUnit still owns coverage, edge cases, regression, and CI. Controls own the canonical example -- the happy-path demonstration of how an object is meant to be used. The two overlap, and that overlap is fine. When you get back to the office on Monday, you shouldn't start moving every test into `lib/my_app/controls/`. You should pick one.
 
 ## Where to start
 
-Find the module in your codebase that people ask about most -- the one whose tests get opened not to run them but to read them. Write a single control for it. One function that builds the object the canonical way, asserts it's correct, and returns it for the next person to use.
+Find the module in your codebase that people ask about most -- the one whose tests get opened not to run them but to read them. Write a single control for it. One `example/0` that builds the object the canonical way, from fixed values, and returns it for the next person to use.
 
 Then the next time someone runs `h` on that module and comes up short, they'll have somewhere better to go than `test/`. The floor model will be out where they can switch it on.
 
 ---
 
-*Controls are a design value from the [Eventide project](https://eventide-project.org/). The examples here draw on Anoma's [examples-over-testing](https://github.com/anoma/anoma/blob/base/documentation/contributing/examples-over-testing.livemd) approach and their [registry example module](https://github.com/anoma/anoma/blob/base/lib/examples/e_registry.ex).*
+*Controls are a design value from the [Eventide project](https://eventide-project.org/). Anoma's [examples-over-testing](https://github.com/anoma/anoma/blob/base/documentation/contributing/examples-over-testing.livemd) guide describes the related approach.*
