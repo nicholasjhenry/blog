@@ -19,6 +19,12 @@ layout: default
       {%- endif -%}</p>
   </header>
 
+  {%- if page.ai_generated -%}
+    <p class="post-ai-notice">
+      This post was written entirely by AI. It isn't published anywhere else: I use these posts to capture my thinking and reflect on it, and share them here in case they're useful to someone else.
+    </p>
+  {%- endif -%}
+
   <div class="post-content e-content" itemprop="articleBody">
     {{ content }}
   </div>

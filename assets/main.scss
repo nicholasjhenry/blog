@@ -279,3 +279,11 @@ blockquote {
   padding-top: $spacing-unit * 0.75;
   border-top: 1px solid $rule-color;
 }
+
+// AI-authorship disclosure, rendered by the post layout when `ai_generated: true`.
+.post-ai-notice {
+  @extend %stamp;
+  margin-bottom: $spacing-unit;
+  padding-bottom: $spacing-unit * 0.75;
+  border-bottom: 1px solid $rule-color;
+}
